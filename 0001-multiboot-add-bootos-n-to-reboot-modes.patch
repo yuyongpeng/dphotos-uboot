@@ -1,0 +1,38 @@
+From 9038f0a1395ecb983f129581f08f59090187038e Mon Sep 17 00:00:00 2001
+From: hzq <service@t-firefly.com>
+Date: Wed, 13 Jun 2018 16:56:58 +0800
+Subject: [PATCH] multiboot: add bootos<n> to reboot modes
+
+---
+ drivers/power/reset/reboot-mode.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/power/reset/reboot-mode.c b/drivers/power/reset/reboot-mode.c
+index 1afccd2..a745c8d 100644
+--- a/drivers/power/reset/reboot-mode.c
++++ b/drivers/power/reset/reboot-mode.c
+@@ -14,6 +14,7 @@
+ #include <linux/of.h>
+ #include <linux/reboot.h>
+ #include "reboot-mode.h"
++#include <dt-bindings/soc/rockchip,boot-mode.h>
+ 
+ #define PREFIX "mode-"
+ 
+@@ -39,6 +40,13 @@ static int get_reboot_mode_magic(struct reboot_mode_driver *reboot,
+ 	if (!cmd || !cmd[0])
+ 		cmd = normal;
+ 
++	if (!strncmp(cmd, "bootos", 6)) {
++		unsigned long idx = simple_strtoul(cmd+6, 0, 10);
++		idx += 100;
++		if (idx > 255)
++		  idx = 255;
++		magic = REBOOT_FLAG + (int)(idx & 0xff);
++	} else
+ 	list_for_each_entry(info, &reboot->head, list) {
+ 		if (!strcmp(info->mode, cmd)) {
+ 			magic = info->magic;
+-- 
+2.7.4
+

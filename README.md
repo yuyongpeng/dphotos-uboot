@@ -1,4 +1,5 @@
 #### 编译:
+	工具链: https://TeeFirefly@gitlab.com/TeeFirefly/prebuilts.git
 	rk3288_defconfig
 	./mkv7.sh
 

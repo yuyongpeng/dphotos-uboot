@@ -164,6 +164,8 @@ enum fbt_reboot_type board_fbt_get_reboot_type(void)
 				frt = FASTBOOT_REBOOT_BOOTOS;
 
 				bootos = reboot_mode - BOOT_BOOTOS;
+				if (bootos > 2)
+					break;
 				printf("multiboot: boot OS#%d\n", bootos);
 				if (bootos == 1)
 					setenv("root", ENV_BOOTOS1);

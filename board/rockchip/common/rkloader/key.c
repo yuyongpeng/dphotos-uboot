@@ -27,6 +27,7 @@ __maybe_unused static key_config	key_rockusb;
 __maybe_unused static key_config	key_recovery;
 __maybe_unused static key_config	key_fastboot;
 __maybe_unused static key_config	key_power;
+__maybe_unused static key_config	key_screen;
 
 
 #ifdef CONFIG_OF_LIBFDT
@@ -86,13 +87,14 @@ static int GetPortState(key_config *key)
 }
 
 
-int checkKey(uint32* boot_rockusb, uint32* boot_recovery, uint32* boot_fastboot)
+int checkKey(uint32* boot_rockusb, uint32* boot_recovery, uint32* boot_fastboot, uint32* boot_screen)
 {
 	printf("checkKey\n");
 
 	*boot_rockusb = 0;
 	*boot_recovery = 0;
 	*boot_fastboot = 0;
+	*boot_screen = 0;
 
 	if(GetPortState(&key_rockusb)) {
 		*boot_rockusb = 1;
@@ -102,6 +104,9 @@ int checkKey(uint32* boot_rockusb, uint32* boot_recovery, uint32* boot_fastboot)
 	}
 	if(GetPortState(&key_fastboot)) {
 		*boot_fastboot = 1;
+	}
+	if(GetPortState(&key_screen)) {
+		*boot_screen = 1;
 	}
 
 	return 0;
@@ -184,6 +189,18 @@ __maybe_unused static void PowerKeyInit(void)
 	key_power.key.ioint.flags = IRQ_TYPE_EDGE_FALLING;
 	key_power.key.ioint.pressed_state = 0;
 	key_power.key.ioint.press_time = 0;
+}
+
+
+__maybe_unused static void ScreenKeyInit(void)
+{
+	key_screen.type = KEY_AD;
+	key_screen.key.adc.index = 0;
+	key_screen.key.adc.keyValueLow = 480;
+	key_screen.key.adc.keyValueHigh = 540;
+	key_screen.key.adc.data = SARADC_BASE + 0;
+	key_screen.key.adc.stas = SARADC_BASE + 4;
+	key_screen.key.adc.ctrl = SARADC_BASE + 8;
 }
 
 
@@ -284,6 +301,7 @@ void key_init(void)
 	memset(&key_recovery, 0, sizeof(key_config));
 	memset(&key_fastboot, 0, sizeof(key_config));
 	memset(&key_power, 0, sizeof(key_config));
+	memset(&key_screen, 0, sizeof(key_config));
 
 	memset(&power_hold_gpio, 0, sizeof(gpio_conf));
 	memset(&charge_state_gpio, 0, sizeof(gpio_conf));
@@ -293,6 +311,7 @@ void key_init(void)
 	FastbootKeyInit();
 	RecoveryKeyInit();
 	PowerKeyInit();
+	ScreenKeyInit();
 
 	ChargeStateGpioInit();
 	PowerHoldGpioInit();

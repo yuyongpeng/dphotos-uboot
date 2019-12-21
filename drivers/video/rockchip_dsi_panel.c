@@ -252,7 +252,7 @@ static int rockchip_dsi_panel_disable(struct display_state *state)
 
 	return 0;
 }
-
+extern int checkKey(uint32* boot_rockusb, uint32* boot_recovery, uint32* boot_fastboot, uint32* boot_screen);
 static int rockchip_dsi_panel_parse_dt(const void *blob, int node, struct rockchip_dsi_panel *panel)
 {
 	struct fdt_gpio_state *enable_gpio = &panel->enable_gpio;
@@ -262,6 +262,7 @@ static int rockchip_dsi_panel_parse_dt(const void *blob, int node, struct rockch
 	const void *data;
 	int len = 0;
 	int ret = 0;
+	uint32 a=0, b=0, c=0, level_flag = 0;
 
 	fdtdec_decode_gpio(blob, node, "enable-gpios", enable_gpio);
 	fdtdec_decode_gpio(blob, node, "reset-gpios", reset_gpio);
@@ -276,7 +277,11 @@ static int rockchip_dsi_panel_parse_dt(const void *blob, int node, struct rockch
 	panel->delay_reset = fdtdec_get_int(blob, node, "reset-delay-ms", 0);
 	panel->bus_format = fdtdec_get_int(blob, node, "bus-format", MEDIA_BUS_FMT_RBG888_1X24);
 
-	data = fdt_getprop(blob, node, "panel-init-sequence", &len);
+	checkKey(&a, &b, &c, &level_flag);
+	if (level_flag == 1 )
+		data = fdt_getprop(blob, node, "panel-init-sequence-new", &len);
+	else
+		data = fdt_getprop(blob, node, "panel-init-sequence", &len);
 	if (data) {
 		panel->on_cmds = malloc(sizeof(*panel->on_cmds));
 		if (!panel->on_cmds)

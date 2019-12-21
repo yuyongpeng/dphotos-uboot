@@ -129,6 +129,8 @@ enum fbt_reboot_type board_fbt_get_reboot_type(void)
 		case BOOT_NORMAL:
 			printf("reboot normal.\n");
 			frt = FASTBOOT_REBOOT_NORMAL;
+			setenv("root", ENV_BOOTOS1);
+			saveenv();
 			break;
 		case BOOT_LOADER:
 #ifdef CONFIG_CMD_ROCKUSB
@@ -206,13 +208,14 @@ int board_fbt_key_pressed(void)
 	enum fbt_reboot_type frt = FASTBOOT_REBOOT_UNKNOWN;
 	int vbus = 0;
 	int ir_keycode = 0;
+	uint32 a;
 
 #ifdef CONFIG_CMD_ROCKUSB
 	vbus = GetVbus();
 #endif
 
 #ifdef CONFIG_RK_KEY
-	checkKey((uint32 *)&boot_rockusb, (uint32 *)&boot_recovery, (uint32 *)&boot_fastboot);
+	checkKey((uint32 *)&boot_rockusb, (uint32 *)&boot_recovery, (uint32 *)&boot_fastboot, (uint32 *)&a);
 #endif
 
 #if defined(CONFIG_RK_PWM_REMOTE)
